@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-md-8">
+        <h2><%= @space[:name] %></h2>
+        <p><%= @space[:address] %></p>
+    </div>
+    <div class="col-md-4">
+        <a href="/spaces/<%= @space[:id] %>/comments/new" class="btn btn-primary">Add new comment</a>
+    </div>
+</div>
+    
+<div class="row"> 
+    <div class="col-md-12">
+        <p><%= @space[:description] %></p>
+        <p><%= @space[:pros] %></p>
+        <p><%= @space[:cons] %></p>
+    </div>
+</div>
+
+<div class="row"> 
+<% for comment in @comments %>
+    <div class="col-md-3">
+        <p><%= comment[:rating] %></p>
+    </div>
+    <div class="col-md-9">
+        <p><%= comment[:comments] %></p>
+    </div>
+<% end %>
+</div>

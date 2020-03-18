@@ -1,0 +1,11 @@
+<h1>StudySpaces</h1>
+
+<div>
+    <ul>
+        <%for space in @spaces %>
+        <li>
+            <a href="/spaces/<%= space[:id] %>"><%= space[:name] %></a>
+        </li>
+        <% end %>
+    </ul>
+</div>

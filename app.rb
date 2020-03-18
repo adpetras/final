@@ -14,5 +14,48 @@ before { puts; puts "--------------- NEW REQUEST ---------------"; puts }       
 after { puts; }                                                                       #
 #######################################################################################
 
-events_table = DB.from(:events)
-rsvps_table = DB.from(:rsvps)
+spaces_table = DB.from(:spaces)
+comments_table = DB.from(:comments)
+
+get "/" do
+    puts "params: #{params}"
+    
+    pp spaces_table.all.to_a
+    @spaces = spaces_table.all.to_a
+    @title = "Home | StudySpaces"
+    view "spaces"
+end
+
+get "/spaces/:id" do
+    puts "params: #{params}"
+
+    pp spaces_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: params["id"]).to_a[0]
+    @comments = comments_table.where(space_id: @space[:id]).to_a
+    view "space"
+end
+
+get "/spaces/:id/comments/new" do
+    puts "params #{params}"
+    
+    @space = spaces_table.where(id: params["id"]).to_a[0]
+    view "new_comment"
+end
+
+get "/spaces/:id/comments/create" do
+    puts "params #{params}"
+
+    # find space we are leaving comment for
+    @space = spaces_table.where(id: params["id"]).to_a[0]
+
+    # insert data in the comments data table
+    comments_table.insert(
+        space_id: @space[:id],
+        name: params["name"],
+        email: params["email"],
+        rating: params["rating"],
+        comments: params["comments"]
+    )
+
+    view "create_comment"
+end

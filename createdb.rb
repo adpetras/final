@@ -5,31 +5,39 @@ DB = Sequel.connect(connection_string)                                          
 #######################################################################################
 
 # Database schema - this should reflect your domain model
-DB.create_table! :events do
+DB.create_table! :spaces do
   primary_key :id
-  String :title
+  String :name
+  String :address
   String :description, text: true
-  String :date
-  String :location
+  Boolean :on_campus
+  String :pros
+  String :cons
 end
-DB.create_table! :rsvps do
+DB.create_table! :comments do
   primary_key :id
-  foreign_key :event_id
-  Boolean :going
+  foreign_key :space_id
   String :name
   String :email
+  String :rating
   String :comments, text: true
 end
 
 # Insert initial (seed) data
-events_table = DB.from(:events)
+spaces_table = DB.from(:spaces)
 
-events_table.insert(title: "Bacon Burger Taco Fest", 
-                    description: "Here we go again bacon burger taco fans, another Bacon Burger Taco Fest is here!",
-                    date: "June 21",
-                    location: "Kellogg Global Hub")
+spaces_table.insert(name: "Deering Library", 
+                    address: "1937 Sheridan Rd, Evanston, IL 60208",
+                    description: "The Charles Deering Memorial Library was built in 1933 and was modeled after King's College Chapel in Cambridge, England. Deering Library served as the main library until 1970 and now houses several distinctive collections. The library was named for Charles H. Deering, a Northwestern benefactor and a patron to the arts.",
+                    on_campus: true,
+                    pros: "Quiet and good for deep, focused work. Great architecture and inspiring atmosphere.",
+                    cons: "Lack of power outlets. Common tables only so not good for group work or meetings.")
 
-events_table.insert(title: "Kaleapolooza", 
-                    description: "If you're into nutrition and vitamins and stuff, this is the event for you.",
-                    date: "July 4",
-                    location: "Nowhere")
+spaces_table.insert(name: "Kellogg Spanish Steps", 
+                    address: "2211 Campus Dr, Evanston, IL 60208",
+                    description: "A pair of sweeping 34-foot-wide stairways reminiscent of Rome's renowned Spanish Steps anchor the Collaboration Plaza. The steps serve as a convening place for students and link the lower level, first floor, and second floor of Kellogg's new Global Hub.",
+                    on_campus: true,
+                    pros: "Plenty of space and good for quick group meetings. You're likely to run into your classmates as they transition between classes.",
+                    cons: "No power outlets. Not great for focused work as there are many people who use the steps to socialize.")
+
+puts "Success!"
