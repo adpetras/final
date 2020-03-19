@@ -15,7 +15,12 @@ after { puts; }                                                                 
 #######################################################################################
 
 spaces_table = DB.from(:spaces)
-comments_table = DB.from(:comments)
+reviews_table = DB.from(:reviews)
+users_table = DB.from(:users)
+
+before do
+    @current_user = users_table.where(id: session["user_id"]).to_a[0]
+end
 
 get "/" do
     puts "params: #{params}"
@@ -28,34 +33,111 @@ end
 
 get "/spaces/:id" do
     puts "params: #{params}"
-
+    
     pp spaces_table.where(id: params["id"]).to_a[0]
     @space = spaces_table.where(id: params["id"]).to_a[0]
-    @comments = comments_table.where(space_id: @space[:id]).to_a
+    @reviews = reviews_table.where(space_id: @space[:id]).to_a
+    @review_count = reviews_table.where(space_id: @space[:id]).count
+    @users_table = users_table
+    # create a way to do average review rating
     view "space"
 end
 
-get "/spaces/:id/comments/new" do
+get "/spaces/:id/reviews/new" do
     puts "params #{params}"
     
     @space = spaces_table.where(id: params["id"]).to_a[0]
-    view "new_comment"
+    view "new_review"
 end
 
-get "/spaces/:id/comments/create" do
+post "/spaces/:id/reviews/create" do
     puts "params #{params}"
 
-    # find space we are leaving comment for
+    # find space we are leaving review for
     @space = spaces_table.where(id: params["id"]).to_a[0]
 
-    # insert data in the comments data table
-    comments_table.insert(
+    # insert data in the reviews data table
+    reviews_table.insert(
         space_id: @space[:id],
-        name: params["name"],
-        email: params["email"],
+        user_id: session["user_id"],
         rating: params["rating"],
         comments: params["comments"]
     )
 
-    view "create_comment"
+    view "create_review"
+end
+
+get "/users/new" do
+    puts "params #{params}"
+
+    view "new_user"
+end
+
+post "/users/create" do
+    puts "params #{params}"
+    
+    # insert data in the users data table
+    users_table.insert(
+        name: params["name"],
+        email: params["email"],
+        password: BCrypt::Password.create(params["password"])
+    )
+
+    view "create_user"
+end
+
+get "/logins/new" do
+    view "new_login"
+end
+
+post "/logins/create" do
+    puts "params #{params}"
+
+    @user = users_table.where(email: params["email"]).to_a[0]
+    
+    if @user && BCrypt::Password.new(@user[:password]) == params["password"]
+        session["user_id"] = @user[:id] 
+        view "create_login"
+    else
+        view "create_login_failed"
+    end
+end
+
+get "/logout" do
+    session["user_id"] = nil
+    view "logout"
+end
+
+get "/reviews/:id/edit" do
+    puts "params #{params}"
+
+    @review = reviews_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: @review[:space_id]).to_a[0]
+    view "edit_review"
+end
+
+post "/reviews/:id/update" do
+    puts "params #{params}"
+
+    @review = reviews_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: @review[:space_id]).to_a[0]
+    
+    # update data in the reviews data table
+    reviews_table.where(id: params["id"]).update(
+        rating: params["rating"],
+        comments: params["comments"]
+    )
+
+    view "update_review"
+end
+
+get "/reviews/:id/destroy" do
+    puts "params #{params}"
+
+    review = reviews_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: review[:space_id]).to_a[0]
+
+    reviews_table.where(id: params["id"]).delete
+
+    view "destroy_review"
 end

@@ -4,7 +4,8 @@
         <p><%= @space[:address] %></p>
     </div>
     <div class="col-md-4">
-        <a href="/spaces/<%= @space[:id] %>/comments/new" class="btn btn-primary">Add new comment</a>
+        <p>Number of reviews: <%= @review_count %></p>
+        <a href="/spaces/<%= @space[:id] %>/reviews/new" class="btn btn-primary">Add new review</a>
     </div>
 </div>
     
@@ -17,12 +18,13 @@
 </div>
 
 <div class="row"> 
-<% for comment in @comments %>
+<% for review in @reviews %>
     <div class="col-md-3">
-        <p><%= comment[:rating] %></p>
+    <p>User: <%= @users_table.where(id: review[:user_id]).to_a[0][:name] %></p>    
+    <p>Rating: <%= review[:rating] %></p>
     </div>
     <div class="col-md-9">
-        <p><%= comment[:comments] %></p>
+        <p><%= review[:comments] %></p>
     </div>
 <% end %>
 </div>

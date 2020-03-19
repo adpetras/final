@@ -14,14 +14,20 @@ DB.create_table! :spaces do
   String :pros
   String :cons
 end
-DB.create_table! :comments do
+DB.create_table! :reviews do
   primary_key :id
   foreign_key :space_id
-  String :name
-  String :email
-  String :rating
+  foreign_key :user_id
+  Integer :rating
   String :comments, text: true
 end
+DB.create_table! :users do
+  primary_key :id
+  String :name
+  String :email
+  String :password
+end
+
 
 # Insert initial (seed) data
 spaces_table = DB.from(:spaces)

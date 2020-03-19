@@ -1,0 +1,53 @@
+<div class="row">
+    <div class="col-md-12">
+        <h2>Edit your review for <%= @space[:name] %></h2>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <form action="/reviews/<%= @review[:id] %>/update" method="post">
+            <div class="form-group">
+                <label>Your overall rating (5 is best, 1 is worst)</label>
+                <select class="form-control" name="rating">
+                <% if @review[:rating] == 5 %> 
+                    <option selected>5</option>
+                    <option>4</option>
+                    <option>3</option>
+                    <option>2</option>
+                    <option>1</option>
+                <% elsif @review[:rating] == 4 %>
+                    <option>5</option>
+                    <option selected>4</option>
+                    <option>3</option>
+                    <option>2</option>
+                    <option>1</option>
+                <% elsif @review[:rating] == 3 %>
+                    <option>5</option>
+                    <option>4</option>
+                    <option selected>3</option>
+                    <option>2</option>
+                    <option>1</option>
+                <% elsif @review[:rating] == 2 %>
+                    <option>5</option>
+                    <option>4</option>
+                    <option>3</option>
+                    <option selected>2</option>
+                    <option>1</option>
+                <% else %>
+                    <option>5</option>
+                    <option>4</option>
+                    <option>3</option>
+                    <option>2</option>
+                    <option selected>1</option>
+                <% end %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Your comments</label>
+                <textarea class="form-control" name="comments" rows="3"><%= @review[:comments] %></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit review</button>
+        </form>
+    </div>
+</div>
