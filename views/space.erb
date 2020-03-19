@@ -18,13 +18,27 @@
 </div>
 
 <div class="row"> 
-<% for review in @reviews %>
-    <div class="col-md-3">
-    <p>User: <%= @users_table.where(id: review[:user_id]).to_a[0][:name] %></p>    
-    <p>Rating: <%= review[:rating] %></p>
+    <div class="col-md-12 mt-5">
+        <h4>Reviews for this space</h4>
     </div>
-    <div class="col-md-9">
+</div>
+<% for review in @reviews %>
+<div class="row mt-3">
+    <div class="col-md-2">
+        <p>User: <%= @users_table.where(id: review[:user_id]).to_a[0][:name] %>  </p>
+    </div>
+    <div class="col-md-3">
+        <p>
+            Rating: <%= review[:rating] %>  
+            <% if @current_user && @current_user[:id] == review[:user_id] %>
+             (<a href="/reviews/<%= review[:id] %>/edit">Edit</a> | <a href="/reviews/<%= review[:id] %>/destroy">Delete</a>)
+        </p>
+        <% end %>
+    </div>  
+</div>
+<div class="row">
+    <div class="col-md-12">
         <p><%= review[:comments] %></p>
     </div>
-<% end %>
 </div>
+<% end %>

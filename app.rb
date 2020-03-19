@@ -67,6 +67,47 @@ post "/spaces/:id/reviews/create" do
     view "create_review"
 end
 
+get "/reviews/:id/edit" do
+    puts "params #{params}"
+
+    @review = reviews_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: @review[:space_id]).to_a[0]
+    if @current_user && @current_user[:id] == @review[:user_id]
+        view "edit_review"
+    else
+        view "error"
+    end
+end
+
+post "/reviews/:id/update" do
+    puts "params #{params}"
+
+    @review = reviews_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: @review[:space_id]).to_a[0]
+    
+    if @current_user && @current_user[:id] == @review[:user_id]
+        # update data in the reviews data table
+        reviews_table.where(id: params["id"]).update(
+            rating: params["rating"],
+            comments: params["comments"]
+        )
+        view "update_review"
+    else
+        view "error"
+    end
+end
+
+get "/reviews/:id/destroy" do
+    puts "params #{params}"
+
+    review = reviews_table.where(id: params["id"]).to_a[0]
+    @space = spaces_table.where(id: review[:space_id]).to_a[0]
+
+    reviews_table.where(id: params["id"]).delete
+
+    view "destroy_review"
+end
+
 get "/users/new" do
     puts "params #{params}"
 
@@ -76,14 +117,18 @@ end
 post "/users/create" do
     puts "params #{params}"
     
-    # insert data in the users data table
-    users_table.insert(
-        name: params["name"],
-        email: params["email"],
-        password: BCrypt::Password.create(params["password"])
-    )
-
-    view "create_user"
+    # insert data in the users data table only if not already signed up
+    existing_user = users_table.where(email: params["email"]).to_a[0]
+    if existing_user
+        view "error"
+    else
+        users_table.insert(
+            name: params["name"],
+            email: params["email"],
+            password: BCrypt::Password.create(params["password"])
+        )
+        view "create_user"
+    end
 end
 
 get "/logins/new" do
@@ -106,38 +151,4 @@ end
 get "/logout" do
     session["user_id"] = nil
     view "logout"
-end
-
-get "/reviews/:id/edit" do
-    puts "params #{params}"
-
-    @review = reviews_table.where(id: params["id"]).to_a[0]
-    @space = spaces_table.where(id: @review[:space_id]).to_a[0]
-    view "edit_review"
-end
-
-post "/reviews/:id/update" do
-    puts "params #{params}"
-
-    @review = reviews_table.where(id: params["id"]).to_a[0]
-    @space = spaces_table.where(id: @review[:space_id]).to_a[0]
-    
-    # update data in the reviews data table
-    reviews_table.where(id: params["id"]).update(
-        rating: params["rating"],
-        comments: params["comments"]
-    )
-
-    view "update_review"
-end
-
-get "/reviews/:id/destroy" do
-    puts "params #{params}"
-
-    review = reviews_table.where(id: params["id"]).to_a[0]
-    @space = spaces_table.where(id: review[:space_id]).to_a[0]
-
-    reviews_table.where(id: params["id"]).delete
-
-    view "destroy_review"
 end
