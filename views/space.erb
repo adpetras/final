@@ -1,44 +1,78 @@
 <div class="row">
-    <div class="col-md-8">
-        <h2><%= @space[:name] %></h2>
-        <p><%= @space[:address] %></p>
-    </div>
-    <div class="col-md-4">
-        <p>Number of reviews: <%= @review_count %></p>
-        <a href="/spaces/<%= @space[:id] %>/reviews/new" class="btn btn-primary">Add new review</a>
-    </div>
-</div>
-    
-<div class="row"> 
     <div class="col-md-12">
-        <p><%= @space[:description] %></p>
-        <p><%= @space[:pros] %></p>
-        <p><%= @space[:cons] %></p>
+        <h2><%= @space[:name] %></h2>
+        <h4><%= @space[:address] %></h4>      
     </div>
 </div>
 
+<hr class="my-4">
+
 <div class="row"> 
-    <div class="col-md-12 mt-5">
-        <h4>Reviews for this space</h4>
+    <div class="col-md-8">
+        <iframe
+            class="w-100 h-100"
+            frameborder="0" style="border:0"
+            src="https://www.google.com/maps/embed/v1/place?key=<%= @google_api_key %>&q=<%= @lat %>,<%= @lng %>&zoom=16">
+        </iframe>
+    </div>
+    <div class="col-md-4">
+        <h4>Pros:</h4>    
+        <h5><%= @space[:pros] %></h5>
+        <h4>---</h4>  
+        <h4>Cons:</h4>    
+        <h5><%= @space[:cons] %></h5>
     </div>
 </div>
+
+<hr class="my-4">
+
+<div class="row"> 
+    <div class="col-md-12">
+        <h3>Description of the space:</h3>
+        <p><%= @space[:description] %></p>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<div class="row"> 
+    <div class="col-md-12">
+        <h3>Reviews for this space</h3>
+    </div>
+</div>
+<div class="row">
+    <div class = "col-md-4">
+        <p>Number of reviews: <%= @review_count %>
+         | 
+        Average rating: <%= @avg_rating %></p>
+    </div>
+    <div class="col-md-8">
+        <a href="/spaces/<%= @space[:id] %>/reviews/new" class="btn btn-primary">Add new review</a>
+    </div>
+</div>
+
 <% for review in @reviews %>
 <div class="row mt-3">
-    <div class="col-md-2">
-        <p>User: <%= @users_table.where(id: review[:user_id]).to_a[0][:name] %>  </p>
+    <div class="col-md-12">
+        <p>-----</p>
     </div>
-    <div class="col-md-3">
-        <p>
+</div>
+<div class="row mt-3">
+    <div class="col-md-2">
+        <h6>User: <%= @users_table.where(id: review[:user_id]).to_a[0][:name] %></h6>
+    </div>
+    <div class="col-md-9">
+        <h6>
             Rating: <%= review[:rating] %>  
             <% if @current_user && @current_user[:id] == review[:user_id] %>
              (<a href="/reviews/<%= review[:id] %>/edit">Edit</a> | <a href="/reviews/<%= review[:id] %>/destroy">Delete</a>)
-        </p>
-        <% end %>
+            <% end %>
+        </h6>
     </div>  
 </div>
 <div class="row">
     <div class="col-md-12">
-        <p><%= review[:comments] %></p>
+        <p>Comments: <%= review[:comments] %></p>
     </div>
 </div>
 <% end %>

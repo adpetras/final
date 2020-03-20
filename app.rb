@@ -5,6 +5,7 @@ require "sequel"                                                                
 require "logger"                                                                      #
 require "twilio-ruby"                                                                 #
 require "bcrypt"                                                                      #
+require "geocoder"                                                                    #
 connection_string = ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.sqlite3"  #
 DB ||= Sequel.connect(connection_string)                                              #
 DB.loggers << Logger.new($stdout) unless DB.loggers.size > 0                          #
@@ -34,12 +35,28 @@ end
 get "/spaces/:id" do
     puts "params: #{params}"
     
-    pp spaces_table.where(id: params["id"]).to_a[0]
+    #pp spaces_table.where(id: params["id"]).to_a[0]
+    @spaces = spaces_table.all.to_a
     @space = spaces_table.where(id: params["id"]).to_a[0]
     @reviews = reviews_table.where(space_id: @space[:id]).to_a
     @review_count = reviews_table.where(space_id: @space[:id]).count
     @users_table = users_table
+    
+    if @review_count > 0
+        @avg_rating = (reviews_table.sum(:rating).to_f / @review_count.to_f).round(1)
+    else
+        @avg_rating = "not yet reviewed"
+    end
+
+    location = @space[:address]
+    results = Geocoder.search(location)
+    lat_lng = results.first.coordinates
+    @lat = lat_lng[0]
+    @lng = lat_lng[1]
     # create a way to do average review rating
+
+    @google_api_key = ENV["GOOGLE_MAPS_KEY"]
+
     view "space"
 end
 
@@ -56,15 +73,18 @@ post "/spaces/:id/reviews/create" do
     # find space we are leaving review for
     @space = spaces_table.where(id: params["id"]).to_a[0]
 
-    # insert data in the reviews data table
-    reviews_table.insert(
-        space_id: @space[:id],
-        user_id: session["user_id"],
-        rating: params["rating"],
-        comments: params["comments"]
-    )
-
-    view "create_review"
+    if @current_user
+        # insert data in the reviews data table
+        reviews_table.insert(
+            space_id: @space[:id],
+            user_id: session["user_id"],
+            rating: params["rating"],
+            comments: params["comments"]
+        )
+        view "create_review"
+    else
+        view "error"
+    end
 end
 
 get "/reviews/:id/edit" do

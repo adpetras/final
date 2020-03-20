@@ -1,11 +1,31 @@
-<h1>StudySpaces</h1>
+<div class="row">
+    <div class="col-md-12">
+        <h1>StudySpaces</h1>
+        <p>A guide to some of the best places to study on the Northwestern campus!</p>
+    </div>
+</div>
 
-<div>
-    <ul>
-        <%for space in @spaces %>
-        <li>
-            <a href="/spaces/<%= space[:id] %>"><%= space[:name] %></a>
-        </li>
-        <% end %>
-    </ul>
+<div class="row mt-5">
+    <div class="col md-12">
+        <h4>Here's a list of some places to study at Northwestern:</h4>
+        <p>Click on the names of the study spaces below to check out more details and reviews from other students!</p>
+    </div>
+</div>
+
+<%for space in @spaces %>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <img src=<%= space[:photo_name] %> class="img-fluid">
+    </div>
+    <div class="col-md-9 my-auto">
+        <h4><a href="/spaces/<%= space[:id] %>"><%= space[:name] %></a></h4>
+    </div>
+</div>
+<% end %>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <p>--</p>
+        <p>Note: This website represents a fictitous company created for educational purposes only</p>
+    </div>
 </div>

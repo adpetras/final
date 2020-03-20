@@ -14,3 +14,4 @@ end
 
 gem 'twilio-ruby'
 gem 'bcrypt'
+gem 'geocoder'
